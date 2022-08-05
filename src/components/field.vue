@@ -10,9 +10,10 @@
 <style scoped lang="scss">
 .field {
   display: grid;
-  grid-template-columns: repeat(v-bind(cols), v-bind(size));
-  grid-template-rows: repeat(v-bind(rows), v-bind(size));
+  grid-template-columns: repeat(v-bind(colsAsString), v-bind(size));
+  grid-template-rows: repeat(v-bind(rowsAsString), v-bind(size));
   grid-gap: 1px;
+  justify-content: center;
 }
 </style>
 
@@ -21,14 +22,14 @@ import { ref } from 'vue-demi'
 import Cell from './cell.vue'
 import type { Cell as ICell } from '../types'
 import { useGameStore } from '../useGameStore'
+import { computed } from '@vue/reactivity'
 
-const cols = ref('10')
-const rows = ref('10')
-const bombs = ref(20)
+const { init, field, cols, rows, isFailed, openCell, flagCell } = useGameStore()!
+init()
+
 const size = ref('30px')
-
-const { init, field, isFailed, openCell, flagCell } = useGameStore()!
-init(+cols.value, +rows.value, bombs.value)
+const colsAsString = computed(() => cols.value.toString())
+const rowsAsString = computed(() => rows.value.toString())
 
 const onOpen = (cell: ICell, options: { isForced: boolean }) => {
   if (isFailed.value) return

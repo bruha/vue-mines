@@ -3,16 +3,20 @@ import { createInjectionState } from '@vueuse/shared'
 import type { Cell, Coords, Field } from './types'
 
 const [useProvideGameStore, useGameStore] = createInjectionState(() => {
-  const cols: Ref<number> = ref(5)
-  const rows: Ref<number> = ref(5)
-  const bombs: Ref<number> = ref()
+  const cols: Ref<number> = ref(10)
+  const rows: Ref<number> = ref(10)
+  const bombs: Ref<number> = ref(20)
   const field: Ref<Field> = ref([])
   const isFailed: Ref<boolean> = ref(false)
 
-  function init(initialCols: number, initialRows: number, initialBombs: number): void {
-    cols.value = initialCols
-    rows.value = initialRows
-    bombs.value = initialBombs
+  function init(
+    { cols: newCols, rows: newRows, bombs: newBombs }:
+    { cols?: number, rows?: number, bombs?: number } = {}
+  ): void {
+    if (newCols) cols.value = newCols
+    if (newRows) rows.value = newRows
+    if (newBombs) bombs.value = newBombs
+    isFailed.value = false
     field.value = Array.from({ length: cols.value * rows.value }, (_el, i) => reactive({
       isOpened: false,
       hasBomb: false,
@@ -110,11 +114,11 @@ const [useProvideGameStore, useGameStore] = createInjectionState(() => {
     ) {
       return null
     } else {
-      return field.value[coords.row * rows.value + coords.col]
+      return field.value[coords.row * cols.value + coords.col]
     }
    }
 
-  return { field, isFailed, init, openCell, flagCell }
+  return { init, field, cols, rows, bombs, isFailed, openCell, flagCell }
 })
 
 export { useProvideGameStore, useGameStore }
