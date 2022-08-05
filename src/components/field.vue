@@ -2,7 +2,7 @@
   <div>
     <h4>Game <span v-show="isFailed">FAILED</span></h4>
     <div class="field">
-      <Cell v-for="cell in field" :cell="cell" @open="onOpen" @flag="onFlag" />
+      <Cell v-for="cell in field" :key="`${cell.coords.col}-${cell.coords.row}`" :cell="cell" @open="onOpen" @flag="onFlag" />
     </div>
   </div>
 </template>
@@ -24,9 +24,7 @@ import type { Cell as ICell } from '../types'
 import { useGameStore } from '../useGameStore'
 import { computed } from '@vue/reactivity'
 
-const { init, field, cols, rows, isFailed, openCell, flagCell } = useGameStore()!
-init()
-
+const { field, cols, rows, isFailed, openCell, flagCell } = useGameStore()!
 const size = ref('30px')
 const colsAsString = computed(() => cols.value.toString())
 const rowsAsString = computed(() => rows.value.toString())

@@ -7,6 +7,7 @@ const [useProvideGameStore, useGameStore] = createInjectionState(() => {
   const rows: Ref<number> = ref(10)
   const bombs: Ref<number> = ref(20)
   const field: Ref<Field> = ref([])
+  const fieldIndex: Ref<number> = ref(0)
   const isFailed: Ref<boolean> = ref(false)
 
   function init(
@@ -17,7 +18,7 @@ const [useProvideGameStore, useGameStore] = createInjectionState(() => {
     if (newRows) rows.value = newRows
     if (newBombs) bombs.value = newBombs
     isFailed.value = false
-    field.value = Array.from({ length: cols.value * rows.value }, (_el, i) => reactive({
+    const newField = Array.from({ length: cols.value * rows.value }, (_el, i) => reactive({
       isOpened: false,
       hasBomb: false,
       hasFlag: false,
@@ -27,11 +28,13 @@ const [useProvideGameStore, useGameStore] = createInjectionState(() => {
         row: Math.floor(i / cols.value),
       },
     }))
-    placeBombs()
+    placeBombs(newField)
+    field.value = newField
+    fieldIndex.value++
   }
 
   function openCell(coords: Coords, options = { isForced: false }): void {
-    const cell = getCell(coords)
+    const cell = getCell(field.value, coords)
     if (!cell) return
     cell.isOpened = true
     if (cell.hasBomb) {
@@ -40,7 +43,7 @@ const [useProvideGameStore, useGameStore] = createInjectionState(() => {
     }
     let nearest: Cell[]
     if (cell.bombsNear === 0 || options.isForced) {
-      nearest = getNearestCells(coords)
+      nearest = getNearestCells(field.value, coords)
       if (options.isForced) {
         nearest
           .filter((cell) => !cell.isOpened && !cell.hasFlag)
@@ -58,44 +61,44 @@ const [useProvideGameStore, useGameStore] = createInjectionState(() => {
   }
 
   function flagCell(coords: Coords): void {
-    const cell = getCell(coords)
+    const cell = getCell(field.value, coords)
     if (cell && !cell.isOpened) {
       cell.hasFlag = !cell.hasFlag
     }
   }
 
-  function placeBombs(): void {
-    let cellsWithoutBomb: number = field.value.length
+  function placeBombs(field: Field): void {
+    let cellsWithoutBomb: number = field.length
     for (let i = 0; i < bombs.value; i++) {
       const newBombIndex: number = Math.floor(Math.random() * cellsWithoutBomb)
-      placeBombByIndex(newBombIndex)
+      placeBombByIndex(field, newBombIndex)
       cellsWithoutBomb--
     }
-    calculateNumbers()
+    calculateNumbers(field)
   }
-  function placeBombByIndex(index: number): void {
-    while (field.value[index].hasBomb && index < field.value.length - 1)
+  function placeBombByIndex(field: Field, index: number): void {
+    while (field[index].hasBomb && index < field.length - 1)
       index++
-    field.value[index].hasBomb = true
-    field.value[index].bombsNear = null
+    field[index].hasBomb = true
+    field[index].bombsNear = null
   }
-  function getNearestCells({ col, row }: Coords): Cell[] {
+  function getNearestCells(field: Field, { col, row }: Coords): Cell[] {
     const res = [
-      getCell({ col: col - 1, row: row - 1 }),
-      getCell({ col, row: row - 1 }),
-      getCell({ col: col + 1, row: row - 1 }),
-      getCell({ col: col - 1, row }),
-      getCell({ col: col + 1, row }),
-      getCell({ col: col - 1, row: row + 1 }),
-      getCell({ col, row: row + 1 }),
-      getCell({ col: col + 1, row: row + 1 }),
+      getCell(field, { col: col - 1, row: row - 1 }),
+      getCell(field, { col, row: row - 1 }),
+      getCell(field, { col: col + 1, row: row - 1 }),
+      getCell(field, { col: col - 1, row }),
+      getCell(field, { col: col + 1, row }),
+      getCell(field, { col: col - 1, row: row + 1 }),
+      getCell(field, { col, row: row + 1 }),
+      getCell(field, { col: col + 1, row: row + 1 }),
     ].filter((cell) => cell != null)
     return res as Cell[]
   }
-  function calculateNumbers(): void {
-    field.value.forEach((cell: Cell, i: number) => {
+  function calculateNumbers(field: Field): void {
+    field.forEach((cell: Cell, i: number) => {
       if (!cell.hasBomb) {
-        cell.bombsNear = getNearestCells(cell.coords).reduce(
+        cell.bombsNear = getNearestCells(field, cell.coords).reduce(
           (sum, cell) => {
             if (cell.hasBomb) sum++
             return sum
@@ -105,7 +108,7 @@ const [useProvideGameStore, useGameStore] = createInjectionState(() => {
       }
     })
   }
-  function getCell(coords: Coords): Cell | null {
+  function getCell(field: Field, coords: Coords): Cell | null {
     if (
       coords.col < 0 ||
       coords.col >= cols.value ||
@@ -114,11 +117,11 @@ const [useProvideGameStore, useGameStore] = createInjectionState(() => {
     ) {
       return null
     } else {
-      return field.value[coords.row * cols.value + coords.col]
+      return field[coords.row * cols.value + coords.col]
     }
    }
 
-  return { init, field, cols, rows, bombs, isFailed, openCell, flagCell }
+  return { init, field, fieldIndex, cols, rows, bombs, isFailed, openCell, flagCell }
 })
 
 export { useProvideGameStore, useGameStore }
