@@ -21,8 +21,8 @@
   text-align: center;
   cursor: default;
 
-  &:not(&--opened):hover {
-    background: #d0d0d0;
+  &--opened, &:not(&--opened):hover {
+    filter: brightness(0.92);
   }
 }
 </style>
