@@ -1,6 +1,7 @@
 <template>
   <div>
     <h1>Mines</h1>
+    <h6>Click to Open the Cell. Right click to Flag the Bomb</h6>
     <Settings />
     <Field :key="fieldIndex" />
   </div>

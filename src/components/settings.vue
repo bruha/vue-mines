@@ -1,5 +1,5 @@
 <template>
-  <form @submit.prevent>
+  <form class="settings" @submit.prevent>
     <section>
       Cols: <input v-model="newCols" type="number" min="5" max="100" />
       Rows: <input v-model="newRows" type="number" min="5" max="100" />
@@ -12,6 +12,9 @@
 </template>
 
 <style lang="scss" scoped>
+.settings {
+  margin: 1rem auto;
+}
 .buttons {
   margin-top: 1rem;
 }

@@ -1,4 +1,4 @@
-import { reactive, ref, Ref } from 'vue-demi'
+import { computed, reactive, ref, Ref } from 'vue-demi'
 import { createInjectionState } from '@vueuse/shared'
 import type { Cell, Coords, Field } from './types'
 
@@ -10,6 +10,7 @@ const [useProvideGameStore, useGameStore] = createInjectionState(() => {
   const fieldIndex: Ref<number> = ref(0)
   const isLost: Ref<boolean> = ref(false)
   const isWon: Ref<boolean> = ref(false)
+  const bombsLeft = computed(() => bombs.value - field.value.filter(cell => cell.hasFlag).length)
 
   function init(
     { cols: newCols, rows: newRows, bombs: newBombs }:
@@ -145,7 +146,7 @@ const [useProvideGameStore, useGameStore] = createInjectionState(() => {
     }
    }
 
-  return { init, field, fieldIndex, cols, rows, bombs, isLost, isWon, openCell, flagCell }
+  return { init, field, fieldIndex, cols, rows, bombs, bombsLeft, isLost, isWon, openCell, flagCell }
 })
 
 export { useProvideGameStore, useGameStore }
