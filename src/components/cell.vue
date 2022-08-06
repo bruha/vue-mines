@@ -3,7 +3,7 @@
     class="cell"
     :class="{
       'cell--opened': cell.isOpened,
-      'cell--inactive': isFailed,
+      'cell--inactive': isGameOver,
     }"
     @click.left="onClickLeft(cell)"
     @click.right.prevent="onClickRight(cell)"
@@ -38,7 +38,7 @@ import type { Cell } from '../types'
 
 interface Props {
   cell: Cell,
-  isFailed: boolean
+  isGameOver: boolean
 }
 defineProps<Props>()
 
@@ -61,7 +61,7 @@ const showValue = (cell: Cell): string => {
     if (cell.hasBomb) {
       return '💣'
     } else {
-      return cell.bombsNear?.toString() ?? ''
+      return cell.bombsNear ? cell.bombsNear.toString() : '·'
     }
   } else if (cell.hasFlag) {
     return '🚩'

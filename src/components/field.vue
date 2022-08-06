@@ -1,8 +1,11 @@
 <template>
   <div>
-    <h4>Game <span v-show="isFailed">FAILED</span></h4>
+    <h4>Game
+      <strong v-show="isLost">LOST</strong>
+      <strong v-show="isWon">WON</strong>
+    </h4>
     <div class="field">
-      <Cell v-for="cell in field" :key="`${cell.coords.col}-${cell.coords.row}`" :cell="cell" :is-failed="isFailed" @open="onOpen" @flag="onFlag" />
+      <Cell v-for="cell in field" :key="`${cell.coords.col}-${cell.coords.row}`" :cell="cell" :is-game-over="isGameOver" @open="onOpen" @flag="onFlag" />
     </div>
   </div>
 </template>
@@ -24,17 +27,18 @@ import type { Cell as ICell } from '../types'
 import { useGameStore } from '../useGameStore'
 import { computed } from '@vue/reactivity'
 
-const { field, cols, rows, isFailed, openCell, flagCell } = useGameStore()!
+const { field, cols, rows, isLost, isWon, openCell, flagCell } = useGameStore()!
 const size = ref('30px')
-const colsAsString = computed(() => cols.value.toString())
-const rowsAsString = computed(() => rows.value.toString())
+const colsAsString = computed((): string => cols.value.toString())
+const rowsAsString = computed((): string => rows.value.toString())
+const isGameOver = computed((): boolean => isLost.value || isWon.value)
 
 const onOpen = (cell: ICell, options: { isForced: boolean }) => {
-  if (isFailed.value) return
+  if (isGameOver.value) return
   openCell(cell.coords, options)
 }
 const onFlag = (cell: ICell) => {
-  if (isFailed.value) return
+  if (isGameOver.value) return
   flagCell(cell.coords)
 }
 </script>

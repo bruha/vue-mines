@@ -8,7 +8,8 @@ const [useProvideGameStore, useGameStore] = createInjectionState(() => {
   const bombs: Ref<number> = ref(20)
   const field: Ref<Field> = ref([])
   const fieldIndex: Ref<number> = ref(0)
-  const isFailed: Ref<boolean> = ref(false)
+  const isLost: Ref<boolean> = ref(false)
+  const isWon: Ref<boolean> = ref(false)
 
   function init(
     { cols: newCols, rows: newRows, bombs: newBombs }:
@@ -20,7 +21,8 @@ const [useProvideGameStore, useGameStore] = createInjectionState(() => {
       const maxBombs = cols.value * rows.value
       bombs.value = newBombs <= maxBombs ? newBombs : maxBombs
     }
-    isFailed.value = false
+    isLost.value = false
+    isWon.value = false
     const newField: Field = Array.from({ length: cols.value * rows.value }, (_el, i) => reactive({
       isOpened: false,
       hasBomb: false,
@@ -41,9 +43,11 @@ const [useProvideGameStore, useGameStore] = createInjectionState(() => {
     if (!cell) return
     cell.isOpened = true
     if (cell.hasBomb) {
-      isFailed.value = true
+      isLost.value = true
+      openField(field.value)
       return
     }
+    if (checkIfWon(field.value)) return
     let nearest: Cell[]
     if (cell.bombsNear === 0 || options.isForced) {
       nearest = getNearestCells(field.value, coords)
@@ -63,11 +67,24 @@ const [useProvideGameStore, useGameStore] = createInjectionState(() => {
     }
   }
 
+  function openField(field: Field): void {
+    field.forEach((cell) => cell.isOpened = true)
+  }
+
   function flagCell(coords: Coords): void {
     const cell = getCell(field.value, coords)
     if (cell && !cell.isOpened) {
       cell.hasFlag = !cell.hasFlag
     }
+    checkIfWon(field.value)
+  }
+
+  function checkIfWon(field: Field): boolean {
+    const isWonCheck = field.every((cell) => cell.isOpened || cell.hasFlag)
+    if (isWonCheck) {
+      isWon.value = true
+    }
+    return isWonCheck
   }
 
   function placeBombs(field: Field): void {
@@ -124,7 +141,7 @@ const [useProvideGameStore, useGameStore] = createInjectionState(() => {
     }
    }
 
-  return { init, field, fieldIndex, cols, rows, bombs, isFailed, openCell, flagCell }
+  return { init, field, fieldIndex, cols, rows, bombs, isLost, isWon, openCell, flagCell }
 })
 
 export { useProvideGameStore, useGameStore }
