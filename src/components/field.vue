@@ -2,12 +2,12 @@
   <div>
     <h4>Game <span v-show="isFailed">FAILED</span></h4>
     <div class="field">
-      <Cell v-for="cell in field" :key="`${cell.coords.col}-${cell.coords.row}`" :cell="cell" @open="onOpen" @flag="onFlag" />
+      <Cell v-for="cell in field" :key="`${cell.coords.col}-${cell.coords.row}`" :cell="cell" :is-failed="isFailed" @open="onOpen" @flag="onFlag" />
     </div>
   </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .field {
   display: grid;
   grid-template-columns: repeat(v-bind(colsAsString), v-bind(size));

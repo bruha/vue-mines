@@ -16,9 +16,12 @@ const [useProvideGameStore, useGameStore] = createInjectionState(() => {
   ): void {
     if (newCols) cols.value = newCols
     if (newRows) rows.value = newRows
-    if (newBombs) bombs.value = newBombs
+    if (newBombs) {
+      const maxBombs = cols.value * rows.value
+      bombs.value = newBombs <= maxBombs ? newBombs : maxBombs
+    }
     isFailed.value = false
-    const newField = Array.from({ length: cols.value * rows.value }, (_el, i) => reactive({
+    const newField: Field = Array.from({ length: cols.value * rows.value }, (_el, i) => reactive({
       isOpened: false,
       hasBomb: false,
       hasFlag: false,

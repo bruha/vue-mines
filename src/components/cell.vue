@@ -3,6 +3,7 @@
     class="cell"
     :class="{
       'cell--opened': cell.isOpened,
+      'cell--inactive': isFailed,
     }"
     @click.left="onClickLeft(cell)"
     @click.right.prevent="onClickRight(cell)"
@@ -11,7 +12,7 @@
   </span>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .cell {
   display: flex;
   align-items: center;
@@ -21,8 +22,12 @@
   text-align: center;
   cursor: default;
 
-  &--opened, &:not(&--opened):hover {
+  &--opened {
     filter: brightness(0.92);
+  }
+  &:not(&--opened):not(&--inactive):hover {
+    filter: brightness(0.92);
+    cursor: pointer;
   }
 }
 </style>
@@ -32,17 +37,18 @@ import { defineEmits, defineProps } from 'vue-demi'
 import type { Cell } from '../types'
 
 interface Props {
-  cell: Cell
+  cell: Cell,
+  isFailed: boolean
 }
 defineProps<Props>()
 
 const emit = defineEmits(['open', 'flag'])
-const onClickLeft = (cell: Cell) => {
+const onClickLeft = (cell: Cell): void => {
   if (!cell.isOpened) {
     emit('open', cell)
   }
 }
-const onClickRight = (cell: Cell) => {
+const onClickRight = (cell: Cell): void => {
   if (cell.isOpened) {
     emit('open', cell, { isForced: true })
   } else {
@@ -50,12 +56,12 @@ const onClickRight = (cell: Cell) => {
   }
 }
 
-const showValue = (cell: Cell) => {
+const showValue = (cell: Cell): string => {
   if (cell.isOpened) {
     if (cell.hasBomb) {
       return '💣'
     } else {
-      return cell.bombsNear
+      return cell.bombsNear?.toString() ?? ''
     }
   } else if (cell.hasFlag) {
     return '🚩'
