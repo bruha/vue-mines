@@ -89,11 +89,11 @@ const [useProvideGameStore, useGameStore] = createInjectionState(() => {
   }
 
   function _placeBombs(field: Field): void {
-    let cellsWithoutBomb: number = field.length
+    let cellIndexesWithoutBomb: number[] = Array.from({ length: field.length }, (_el, i) => i)
     for (let i = 0; i < bombs.value; i++) {
-      const newBombIndex: number = Math.floor(Math.random() * cellsWithoutBomb)
-      _placeBombByIndex(field, newBombIndex)
-      cellsWithoutBomb--
+      const bombIndex: number = Math.floor(Math.random() * cellIndexesWithoutBomb.length)
+      _placeBombByIndex(field, cellIndexesWithoutBomb[bombIndex])
+      cellIndexesWithoutBomb.splice(bombIndex, 1)
     }
     _calculateNumbers(field)
   }
