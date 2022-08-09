@@ -31,9 +31,9 @@ import { computed } from '@vue/reactivity'
 
 const { field, cols, rows, bombsLeft, isLost, isWon, openCell, flagCell } = useGameStore()!
 const size = ref('30px')
-const colsAsString = computed((): string => cols.value.toString())
-const rowsAsString = computed((): string => rows.value.toString())
-const isGameOver = computed((): boolean => isLost.value || isWon.value)
+const colsAsString = computed<string>(() => cols.value.toString())
+const rowsAsString = computed<string>(() => rows.value.toString())
+const isGameOver = computed<boolean>(() => isLost.value || isWon.value)
 
 const onOpen = (cell: ICell, options: { isForced: boolean }) => {
   if (isGameOver.value) return

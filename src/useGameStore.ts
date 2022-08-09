@@ -10,7 +10,7 @@ const [useProvideGameStore, useGameStore] = createInjectionState(() => {
   const fieldIndex: Ref<number> = ref(0)
   const isLost: Ref<boolean> = ref(false)
   const isWon: Ref<boolean> = ref(false)
-  const bombsLeft = computed(() => bombs.value - field.value.filter(cell => cell.hasFlag).length)
+  const bombsLeft = computed<number>(() => bombs.value - field.value.filter(cell => cell.hasFlag).length)
 
   function init(
     { cols: newCols, rows: newRows, bombs: newBombs }:
